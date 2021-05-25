@@ -1,0 +1,32 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+html, body, #map {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+#addNodeBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    z-index: 400;
+}
+#addNodeBtn:hover {
+    background: lightsalmon;
+}
+#node.png {
+    font-size: 1.5em;
+}
+
+.red{
+    background: red;
+}
+
+.button{
+    z-index: 1000;
+}
