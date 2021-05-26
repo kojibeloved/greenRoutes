@@ -48,6 +48,5 @@ function calcDistHaver(node1, node2) {
 		Math.sin(deltaLonRad / 2) * Math.sin(deltaLonRad / 2);
 	let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-	let finalDistance = Math.floor(radiusOfEarth * c); // final distance in meters
-	return finalDistance;
+	return (Math.floor(radiusOfEarth * c));
 }

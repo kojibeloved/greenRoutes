@@ -22,7 +22,7 @@ function dijkstra(matrix, startNode, endNode) {
 					distanceFromSource[i] = distanceFromSource[indexU] + weights[i];
 					let newpath = [...shortestPath[indexU]];
 					newpath.push(i);
-					shortestPath[i] = newpath; //... copies to a new array in shortestPath
+					shortestPath[i] = newpath;
 				}
 			}
 		}
@@ -44,7 +44,7 @@ function findMinimumNonCompletedVertex(matrix, distanceFromsource, verticiesComp
 }
 
 export function createArrayOfCoordinatesFromShortestPath(matrix, startNode, endNode){
-	let shortestPath = dijkstra(matrix, startNode, endNode); //start and endnode needs to be ints, and will refer to indexes in the adjMatrix
+	let shortestPath = dijkstra(matrix, startNode, endNode);
 	let pathArray = [];
 	for (let i = 0; i < shortestPath.length; i++) {
 		let index = shortestPath[i];
