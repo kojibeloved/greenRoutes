@@ -1,4 +1,4 @@
-export function createAdjacencyMatrix(listOfNodes){
+export function createGreenAdjacencyMatrix(listOfNodes){
 	let adjMatrix = new Array(listOfNodes.length).fill(null);
 
 	for (let i = 0; i < listOfNodes.length; i++){
@@ -22,6 +22,7 @@ export function createNonGreenAdjacencyMatrix(listOfNodes){
 	for (let i = 0; i < listOfNodes.length; i++){
 		adjMatrixNonGreen[i] = new Array(listOfNodes.length).fill(null);
 		for (let j = 0; j < listOfNodes.length; j++) {
+			// make all nodes have the distance 0 to themselves
 			if (i === j) {
 				adjMatrixNonGreen[i][j] = 0;
 			}
@@ -36,9 +37,9 @@ export function createNonGreenAdjacencyMatrix(listOfNodes){
 
 /* --------- CALCULATE DISTANCE --------- */
 function calcDistHaver(node1, node2) {
-	let R = 6371000; // Radius of Earth, Sol-system, in metres
+	let radiusOfEarth = 6371000; // Radius of Earth in meters
 	let lat1Rad = node1.lat * Math.PI / 180; // latitude in radians
-	let lat2Rad = node2.lat * Math.PI / 180; // latitude in radians || none of these are necessary, or maybe they are?
+	let lat2Rad = node2.lat * Math.PI / 180;
 	let deltaLatRad = (node2.lat - node1.lat) * Math.PI / 180; //delta latitude
 	let deltaLonRad = (node2.lon - node1.lon) * Math.PI / 180; //delta longitude
 
@@ -47,6 +48,6 @@ function calcDistHaver(node1, node2) {
 		Math.sin(deltaLonRad / 2) * Math.sin(deltaLonRad / 2);
 	let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-	let dist = Math.floor(R * c); // final distance in meters
-	return dist;
+	let finalDistance = Math.floor(radiusOfEarth * c); // final distance in meters
+	return finalDistance;
 }

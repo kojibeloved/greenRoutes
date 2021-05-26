@@ -1,103 +1,117 @@
-const canvas = document.querySelector('canvas'); //setup canvas
+/* --------- INITIALIZE CANVAS --------- */
+const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth; // = picPixX
-canvas.height = window.innerHeight; // = picPixY
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-function copyArrayEmpty(inputArray) { //makes a [0, 0]-filled copy of the input array
-	let emptyArrayCopy = []; // creates truly empty array
-	for(let z = 0; z < inputArray.length; z++) { //fill empty array indexes with other array [0, 0]
-		let arrayPiece = [0, 0];
-		emptyArrayCopy.push(arrayPiece);
+/* --------- CREATES IMAGE MODEL --------- */
+export function drawImageMap(greenRoute, nonGreenRoute, listOfNodes) {
+	//only draws image if canvas is initialized
+	if (ctx) {
+		const mapImg = new Image();
+		mapImg.src = './MapGraphicBackground.png';
+		mapImg.onload = function () {
+			//use of drawImage method for drawing an image onto the canvas
+			ctx.drawImage(mapImg, 0, 0);
+			mapGraphics(greenRoute, nonGreenRoute, listOfNodes);
+		};
 	}
-	return emptyArrayCopy;
 }
 
-function mapGraphics(pathArray, pathNonGreen, listOfNodes) { //draw map with nodes and path - (coArray, pathArray)
-	let topLeftCor = [55.697750, 12.535578]; // MapPic-corners
-	let topRightCor = [55.697750, 12.552651]; // longitude = x, latitude = y
-	let botRightCor = [55.688963, 12.552651]; //These co's are soo not accurate #lazy
+/* --------- DRAW ROUTES ONTO MODEL --------- */
+function mapGraphics(greenRoute, nonGreenRoute, listOfNodes) {
+	//
+	let topLeftCorner = [55.697750, 12.535578];
+	let topRightCorner = [55.697750, 12.552651];
+	let botRightCorner = [55.688963, 12.552651];
 
-	let deltaLon = topRightCor[1] - topLeftCor[1]; //longitude span
-	let deltaLat = topRightCor[0] - botRightCor[0]; //latitude span
+	let deltaLon = topRightCorner[1] - topLeftCorner[1]; //longitude span
+	let deltaLat = topRightCorner[0] - botRightCorner[0]; //latitude span
 
-	const picPixX = 796; //Background map-picture dimensions i pixels
-	const picPixY = 720; //Background map-picture dimensions i pixels
+	//image dimensions
+	const imgPixelsX = 796;
+	const imgPixelsY = 720;
 
-	let pixLon = picPixX / deltaLon; //pixels per degree of longitude
-	let pixLat = picPixY / deltaLat; //pixels per degree of latitude
+	let pixelLon = imgPixelsX / deltaLon; //pixels per degree of longitude
+	let pixelLat = imgPixelsY / deltaLat; //pixels per degree of latitude
 
-	let pixelPathArray = copyArrayEmpty(pathArray); //creates a [0, 0]-filled copy of the input array
-	let pixelPathNonGreen = copyArrayEmpty(pathNonGreen);
-	let pixelCoArray = copyArrayEmpty(listOfNodes); //creates a [0, 0]-filled copy of the input array
+	let greenRouteInPixels = createEmptyArrayForPixels(greenRoute);
+	let nonGreenRouteInPixels = createEmptyArrayForPixels(nonGreenRoute);
 
+	//draw all nodes on map
 	for (let i = 0; i < listOfNodes.length; i++) { //finds new coordinates for nodes in array
-		let tempDeltaLon = listOfNodes[i].lon - topLeftCor[1]; //difference in longitude
-		let tempDeltaLat = listOfNodes[i].lat - botRightCor[0]; //difference in latitude
-		let nodeNewCoX = Math.floor(tempDeltaLon * pixLon); //new pixel coordinate
-		let nodeNewCoY = picPixY - Math.floor(tempDeltaLat * pixLat); //new pixel coordinate
-		pixelCoArray[i][1] = nodeNewCoX;
-		pixelCoArray[i][0] = nodeNewCoY;
+		let tempDeltaLon = listOfNodes[i].lon - topLeftCorner[1]; //difference in longitude
+		let tempDeltaLat = listOfNodes[i].lat - botRightCorner[0]; //difference in latitude
+		let pixelCoordinateX = Math.floor(tempDeltaLon * pixelLon); //new pixel coordinate
+		let pixelCoordinateY = imgPixelsY - Math.floor(tempDeltaLat * pixelLat); //new pixel coordinate
 		ctx.fillStyle = "rgba(0, 200, 0, 0.8)";
-		ctx.fillRect((pixelCoArray[i][1] - 3), (pixelCoArray[i][0] - 3), 6, 6); //draw nodes
-	}
-	for (let l = 0; l < (pathNonGreen.length); l++) { //draw path
-		let tempDeltaLon = pathNonGreen[l][1] - topLeftCor[1]; //difference in longitude
-		let tempDeltaLat = pathNonGreen[l][0] - botRightCor[0]; //difference in latitude
-		let nodePathCoX = Math.floor(tempDeltaLon * pixLon); //new pixel coordinate
-		let nodePathCoY = picPixY - Math.floor(tempDeltaLat * pixLat);
-		pixelPathNonGreen[l][1] = nodePathCoX;
-		pixelPathNonGreen[l][0] = nodePathCoY;
+		ctx.fillRect((pixelCoordinateX - 3), (pixelCoordinateY - 3), 6, 6); //draw nodes
 	}
 
-	for (let j = 0; j < (pixelPathNonGreen.length - 1); j++) {
-		let k = j + 1;
+	//from non green route to pixels
+	for (let i = 0; i < nonGreenRoute.length; i++) { //draw path
+		let tempDeltaLon = nonGreenRoute[i][1] - topLeftCorner[1]; //difference in longitude
+		let tempDeltaLat = nonGreenRoute[i][0] - botRightCorner[0]; //difference in latitude
+		let nodePathCoX = Math.floor(tempDeltaLon * pixelLon); //new pixel coordinate
+		let nodePathCoY = imgPixelsY - Math.floor(tempDeltaLat * pixelLat);
+		nonGreenRouteInPixels[i][1] = nodePathCoX;
+		nonGreenRouteInPixels[i][0] = nodePathCoY;
+	}
+	//from pixels to graphical line
+	for (let i = 0; i < (nonGreenRouteInPixels.length - 1); i++) {
+		let j = i + 1;
+		//route outline (initialized as a background)
 		ctx.beginPath();
-		ctx.lineWidth = 4; //thiccness of line
-		ctx.moveTo(pixelPathNonGreen[j][1], pixelPathNonGreen[j][0]);
-		ctx.lineTo(pixelPathNonGreen[k][1], pixelPathNonGreen[k][0]);
+		ctx.lineWidth = 4;
+		ctx.moveTo(nonGreenRouteInPixels[i][1], nonGreenRouteInPixels[i][0]);
+		ctx.lineTo(nonGreenRouteInPixels[j][1], nonGreenRouteInPixels[j][0]);
 		ctx.strokeStyle = "#0000FF";
 		ctx.stroke();
-
+		//route foreground
 		ctx.beginPath();
-		ctx.lineWidth = 3; //thiccness of line
-		ctx.moveTo(pixelPathNonGreen[j][1], pixelPathNonGreen[j][0]);
-		ctx.lineTo(pixelPathNonGreen[k][1], pixelPathNonGreen[k][0]);
+		ctx.lineWidth = 3;
+		ctx.moveTo(nonGreenRouteInPixels[i][1], nonGreenRouteInPixels[i][0]);
+		ctx.lineTo(nonGreenRouteInPixels[j][1], nonGreenRouteInPixels[j][0]);
 		ctx.strokeStyle = "#FF0000";
 		ctx.stroke();
 	}
-	for (let l = 0; l < (pathArray.length); l++) { //draw path
-		let tempDeltaLon = pathArray[l][1] - topLeftCor[1]; //difference in longitude
-		let tempDeltaLat = pathArray[l][0] - botRightCor[0]; //difference in latitude
-		let nodePathCoX = Math.floor(tempDeltaLon * pixLon); //new pixel coordinate
-		let nodePathCoY = picPixY - Math.floor(tempDeltaLat * pixLat);
-		pixelPathArray[l][1] = nodePathCoX;
-		pixelPathArray[l][0] = nodePathCoY;
+
+	//from green route to pixels
+	for (let i = 0; i < greenRoute.length; i++) { //draw path
+		let tempDeltaLon = greenRoute[i][1] - topLeftCorner[1]; //difference in longitude
+		let tempDeltaLat = greenRoute[i][0] - botRightCorner[0]; //difference in latitude
+		let nodePathCoX = Math.floor(tempDeltaLon * pixelLon); //new pixel coordinate
+		let nodePathCoY = imgPixelsY - Math.floor(tempDeltaLat * pixelLat);
+		greenRouteInPixels[i][1] = nodePathCoX;
+		greenRouteInPixels[i][0] = nodePathCoY;
 	}
-	for (let j = 0; j < (pixelPathArray.length - 1); j++) {
-		let k = j + 1;
+
+	//from pixels to graphical line
+	for (let i = 0; i < (greenRouteInPixels.length - 1); i++) {
+		let j = i + 1;
+		//route outline (initialized as a background)
 		ctx.beginPath();
-		ctx.lineWidth = 4; //thiccness of line
-		ctx.moveTo(pixelPathArray[j][1], pixelPathArray[j][0]);
-		ctx.lineTo(pixelPathArray[k][1], pixelPathArray[k][0]);
+		ctx.lineWidth = 4;
+		ctx.moveTo(greenRouteInPixels[i][1], greenRouteInPixels[i][0]);
+		ctx.lineTo(greenRouteInPixels[j][1], greenRouteInPixels[j][0]);
 		ctx.strokeStyle = "#0000FF";
 		ctx.stroke();
-
+		//route foreground
 		ctx.beginPath();
-		ctx.lineWidth = 3; //thiccness of line
-		ctx.moveTo(pixelPathArray[j][1], pixelPathArray[j][0]);
-		ctx.lineTo(pixelPathArray[k][1], pixelPathArray[k][0]);
+		ctx.lineWidth = 3;
+		ctx.moveTo(greenRouteInPixels[i][1], greenRouteInPixels[i][0]);
+		ctx.lineTo(greenRouteInPixels[j][1], greenRouteInPixels[j][0]);
 		ctx.strokeStyle = "#00FF00";
 		ctx.stroke();
 	}
 }
 
-export function drawImageMap(path, nonGreen, co) {
-	if (ctx) {
-		const mapImg = new Image(); //Loading of the image - mapImg
-		mapImg.src = './MapGraphicBackgroundIII.png'; // image location
-		mapImg.onload = function () {  //drawing of the image - mapImg
-			ctx.drawImage(mapImg, 0, 0); //draw background image
-			mapGraphics(path, nonGreen, co); //draw graphics over the img
-		};
+/* --------- ARRAY FOR PIXELS --------- */
+function createEmptyArrayForPixels(inputArray) {
+	let arrayForPixels = [];
+	for(let i = 0; i < inputArray.length; i++) {
+		let innerArray = [0, 0];
+		arrayForPixels.push(innerArray);
 	}
+	return arrayForPixels;
 }

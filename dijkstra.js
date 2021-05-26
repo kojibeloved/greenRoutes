@@ -9,16 +9,12 @@ function dijkstra(matrix, startNode, endNode) {
 
 	while(verticiesCompleted.includes(false)){
 		let indexU = findMinimumNonCompletedVertex(matrix, distanceFromSource, verticiesCompleted);
-
-		//New array containing one note of the adjMatrix
-		//array at a time. In this example we will have one array with 5 elements --- weights is converted in to an array type cohesion
 		let weights = matrix[indexU];
 		verticiesCompleted[indexU] = true;
 		if (endNode === indexU){
 			break;
 		}
-
-		//lav relaxation som en seperat funktion så den kan unit testes
+		//relaxation
 		for (let i = 0; i < weights.length; i++){
 			if (!verticiesCompleted[i] && weights[i] != null){
 				// Checking the connection between vertex indexU, i
@@ -50,7 +46,7 @@ function findMinimumNonCompletedVertex(matrix, distanceFromsource, verticiesComp
 export function createArrayOfCoordinatesFromShortestPath(matrix, startNode, endNode){
 	let shortestPath = dijkstra(matrix, startNode, endNode); //start and endnode needs to be ints, and will refer to indexes in the adjMatrix
 	let pathArray = [];
-	for (let i = 0; i < shortestPath.length; i++){
+	for (let i = 0; i < shortestPath.length; i++) {
 		let index = shortestPath[i];
 		let node = listOfNodes[index];
 		let nodeCoords = [node.lat, node.lon];
