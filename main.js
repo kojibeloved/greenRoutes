@@ -3,13 +3,17 @@ import {createGreenAdjacencyMatrix, createNonGreenAdjacencyMatrix} from "./creat
 import {createArrayOfCoordinatesFromShortestPath} from "./dijkstra.js";
 import {drawImageMap} from "./graphics.js";
 
-function greenerRoutes(startNode, endNode) {
+function greenRouting(startNode, endNode) {
 	let greenAdjMatrix = createGreenAdjacencyMatrix(listOfNodes);
 	let nonGreenAdjMatrix = createNonGreenAdjacencyMatrix(listOfNodes);
+	// make green route
 	let greenRoute = createArrayOfCoordinatesFromShortestPath(greenAdjMatrix, startNode, endNode);
+	// make non green route (red) to compare with the difference of our algorithm
 	let nonGreenRoute = createArrayOfCoordinatesFromShortestPath(nonGreenAdjMatrix, startNode, endNode);
 
 	drawImageMap(greenRoute, nonGreenRoute, listOfNodes);
 }
 
-greenerRoutes(65, 14);
+// Give start and end node.
+// Currently out model has a total of 88 nodes and you simply call them by their index
+greenRouting(65, 14);
