@@ -47,6 +47,6 @@ function calcDistHaver(node1, node2) {
 		Math.cos(lat1Rad) * Math.cos(lat2Rad) *
 		Math.sin(deltaLonRad / 2) * Math.sin(deltaLonRad / 2);
 	let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-	return (Math.floor(radiusOfEarth * c));
+	let finalDistance = Math.floor(radiusOfEarth * c);
+	return finalDistance;
 }
