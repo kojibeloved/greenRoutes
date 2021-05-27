@@ -15,5 +15,5 @@ function greenRouting(startNode, endNode) {
 }
 
 // Give start and end node.
-// Currently our model has a total of 88 nodes and you simply call them by their index
-greenRouting(6, 70);
+// Currently out model has a total of 88 nodes and you simply call them by their index
+greenRouting(0, 14);

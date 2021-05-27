@@ -45,12 +45,12 @@ function findMinimumNonCompletedVertex(matrix, distanceFromsource, verticiesComp
 
 export function createArrayOfCoordinatesFromShortestPath(matrix, startNode, endNode){
 	let shortestPath = dijkstra(matrix, startNode, endNode);
-	let pathArray = [];
+	let shortestPathInCoordinates = [];
 	for (let i = 0; i < shortestPath.length; i++) {
 		let index = shortestPath[i];
 		let node = listOfNodes[index];
 		let nodeCoords = [node.lat, node.lon];
-		pathArray.push(nodeCoords);
+		shortestPathInCoordinates.push(nodeCoords);
 	}
-	return pathArray;
+	return shortestPathInCoordinates;
 }
