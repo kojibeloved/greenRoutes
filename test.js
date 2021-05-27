@@ -7,6 +7,7 @@
 import {listOfNodes} from './nodes.js';
 import {createGreenAdjacencyMatrix, createNonGreenAdjacencyMatrix} from "./createGreenAdjacencyMatrix.js";
 import {createArrayOfCoordinatesFromShortestPath} from "./dijkstra.js";
+import {createArrayOfPixelCoordinatesFromRoute} from "./graphicsTest.js";
 
 //const createArrayOfCoordinatesFromShortestPath = require('./main.js')
 
@@ -81,6 +82,34 @@ let expectedNonGreen0x13 = [
     [55.693044, 12.542531],
     [55.691145, 12.545176]
 ];
+let expectedPixelsNonGreen0x13 = [
+    [18, 352],
+    [63, 351],
+    [113, 349],
+    [214, 354],
+    [222, 364],
+    [237, 355],
+    [278, 332],
+    [316, 311],
+    [348, 294],
+    [386, 324],
+    [542, 447]
+];
+let expectedPixelsGreen0x13 = [
+    [18, 352],
+    [33, 273],
+    [77, 272],
+    [98, 248],
+    [147, 247],
+    [231, 250],
+    [251, 253],
+    [309, 262],
+    [355, 275],
+    [364, 284],
+    [373, 295],
+    [386, 324],
+    [542, 447]
+];
 
 export function nonGreenTest(listOfNodes, start, end, successfulTests, expected) {
     let matrix = createNonGreenAdjacencyMatrix(listOfNodes);
@@ -110,15 +139,65 @@ function greenTest(listOfNodes, start, end, successfulTests, expected) {
     };
 };
 
+function pixelGreenTest(listOfNodes, start, end, successfulTests, expected) {
+    let matrix = createGreenAdjacencyMatrix(listOfNodes);
+    let route = createArrayOfCoordinatesFromShortestPath(matrix, start, end);
+    let topLeftCorner = [55.697750, 12.535578];
+    let topRightCorner = [55.697750, 12.552651];
+    let botRightCorner = [55.688963, 12.552651];
+    const imgPixelsX = 796;
+    const imgPixelsY = 720;
+    let deltaLon = topRightCorner[1] - topLeftCorner[1];
+    let deltaLat = topRightCorner[0] - botRightCorner[0];
+    let pixelLon = imgPixelsX / deltaLon;
+    let pixelLat = imgPixelsY / deltaLat;
+
+    if(JSON.stringify(createArrayOfPixelCoordinatesFromRoute(route, topLeftCorner, botRightCorner, pixelLon, pixelLat, imgPixelsY)) === JSON.stringify(expected)) {
+        //console.log(createArrayOfCoordinatesFromShortestPath(matrix, start, end));
+        console.log("PixelGreenTest is successful.");
+        successfulTests++;
+        return successfulTests;
+    } else {
+        console.log("PixelGreenTest has failed.");
+        return successfulTests;
+    };
+};
+
+function pixelNonGreenTest(listOfNodes, start, end, successfulTests, expected) {
+    let matrix = createNonGreenAdjacencyMatrix(listOfNodes);
+    let route = createArrayOfCoordinatesFromShortestPath(matrix, start, end);
+    let topLeftCorner = [55.697750, 12.535578];
+    let topRightCorner = [55.697750, 12.552651];
+    let botRightCorner = [55.688963, 12.552651];
+    const imgPixelsX = 796;
+    const imgPixelsY = 720;
+    let deltaLon = topRightCorner[1] - topLeftCorner[1];
+    let deltaLat = topRightCorner[0] - botRightCorner[0];
+    let pixelLon = imgPixelsX / deltaLon;
+    let pixelLat = imgPixelsY / deltaLat;
+
+    if(JSON.stringify(createArrayOfPixelCoordinatesFromRoute(route, topLeftCorner, botRightCorner, pixelLon, pixelLat, imgPixelsY)) === JSON.stringify(expected)) {
+        //console.log(createArrayOfCoordinatesFromShortestPath(matrix, start, end));
+        console.log("PixelNonGreenTest is successful.");
+        successfulTests++;
+        return successfulTests;
+    } else {
+        console.log("PixelNonGreenTest has failed.");
+        return successfulTests;
+    };
+};
+
 function testSuite() {
     // SETUP
-    let numberOfTests = 4;
+    let numberOfTests = 6;
     let successfulTests = 0;
     // TESTSUITE
     successfulTests = (greenTest(listOfNodes, 1, 16, successfulTests, expectedGreen1x16));
     successfulTests = (greenTest(listOfNodes, 20, 27, successfulTests, expectedGreen20x27));
     successfulTests = (greenTest(listOfNodes, 0, 13, successfulTests, expectedGreen0x13));
     successfulTests = (nonGreenTest(listOfNodes, 0, 13, successfulTests, expectedNonGreen0x13));
+    successfulTests = (pixelGreenTest(listOfNodes, 0, 13, successfulTests, expectedPixelsGreen0x13));
+    successfulTests = (pixelNonGreenTest(listOfNodes, 0, 13, successfulTests, expectedPixelsNonGreen0x13));
     // USER FEEDBACK
     if(successfulTests === numberOfTests) {
         console.log("All", successfulTests, "tests are successful!");
